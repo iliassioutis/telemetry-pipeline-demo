@@ -1,0 +1,63 @@
+name: telemetry-pipeline-demo
+
+on:
+  workflow_dispatch:
+    inputs:
+      run_date:
+        description: "Optional YYYY-MM-DD (UTC). Leave empty to use today's UTC date."
+        required: false
+        default: ""
+  schedule:
+    # Runs daily at 06:15 UTC (change later if you want)
+    - cron: "15 6 * * *"
+
+jobs:
+  run-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Resolve run date (UTC)
+        id: vars
+        shell: bash
+        run: |
+          if [ -n "${{ inputs.run_date }}" ]; then
+            DATE="${{ inputs.run_date }}"
+          else
+            DATE="$(date -u +%F)"
+          fi
+          echo "date=$DATE" >> "$GITHUB_OUTPUT"
+          echo "Using DATE=$DATE"
+
+      - name: Generate bronze (synthetic data)
+        run: |
+          python --version
+          python src/generate_bronze.py
+
+      - name: Bronze -> Silver (validate + quarantine + DQ report)
+        run: |
+          DATE="${{ steps.vars.outputs.date }}"
+          python src/bronze_to_silver.py --date "$DATE"
+
+      - name: Silver -> Gold (curated outputs)
+        run: |
+          DATE="${{ steps.vars.outputs.date }}"
+          python src/silver_to_gold.py --date "$DATE"
+
+      - name: Upload run artifacts (downloads)
+        uses: actions/upload-artifact@v4
+        with:
+          name: pipeline-artifacts-${{ steps.vars.outputs.date }}
+          path: |
+            reports/dq_${{ steps.vars.outputs.date }}.md
+            lake/bronze/${{ steps.vars.outputs.date }}/generation_meta.json
+            lake/quarantine/${{ steps.vars.outputs.date }}/sensor_readings_rejects.csv
+            lake/gold/${{ steps.vars.outputs.date }}/*.csv
+            exports/${{ steps.vars.outputs.date }}/*.csv
