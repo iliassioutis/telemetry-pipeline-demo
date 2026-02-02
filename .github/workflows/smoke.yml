@@ -1,0 +1,10 @@
+name: runner-smoke-test
+
+on:
+  workflow_dispatch:
+
+jobs:
+  smoke:
+    runs-on: ubuntu-22.04
+    steps:
+      - run: echo "Runner OK" && python --version
