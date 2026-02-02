@@ -1,0 +1,16 @@
+# --- generated pipeline outputs (do not commit) ---
+lake/bronze/
+lake/silver/
+lake/gold/
+lake/quarantine/
+
+# Generated reports (we may choose to commit later; ignore for now)
+reports/*.md
+
+# OS/editor noise
+.DS_Store
+Thumbs.db
+
+# Python caches
+__pycache__/
+*.pyc
