@@ -7,6 +7,10 @@ lake/quarantine/
 # Generated reports (we may choose to commit later; ignore for now)
 reports/*.md
 
+# Generated exports (do not commit)
+exports/**
+!exports/.keep
+
 # OS/editor noise
 .DS_Store
 Thumbs.db
