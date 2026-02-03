@@ -3,6 +3,10 @@
 This repo demonstrates an "Azure-style" data pipeline using free tooling, designed to mirror a typical
 manufacturing / industrial analytics scenario (multi-plant data consolidation).
 
+## Architecture
+
+![Telemetry pipeline architecture](docs/diagrams/architecture.png)
+
 ## Scenario
 Daily ingest of synthetic data from multiple plants:
 - Asset registry (machines/pumps/lines) and plant master data
