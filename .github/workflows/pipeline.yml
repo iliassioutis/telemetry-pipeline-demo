@@ -51,6 +51,20 @@ jobs:
           DATE="${{ steps.vars.outputs.date }}"
           python src/silver_to_gold.py --date "$DATE"
 
+      - name: Add run summary
+        shell: bash
+        run: |
+          echo "## Telemetry pipeline run summary" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "- Run date (UTC): ${{ steps.vars.outputs.date }}" >> $GITHUB_STEP_SUMMARY
+          echo "" >> $GITHUB_STEP_SUMMARY
+          echo "### Key outputs" >> $GITHUB_STEP_SUMMARY
+          echo "- Bronze: lake/bronze/${{ steps.vars.outputs.date }}/" >> $GITHUB_STEP_SUMMARY
+          echo "- Silver: lake/silver/${{ steps.vars.outputs.date }}/sensor_readings_clean.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- Quarantine: lake/quarantine/${{ steps.vars.outputs.date }}/sensor_readings_rejects.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- Gold: lake/gold/${{ steps.vars.outputs.date }}/plant_kpis.csv, asset_health_daily.csv" >> $GITHUB_STEP_SUMMARY
+          echo "- DQ report: reports/dq_${{ steps.vars.outputs.date }}.md" >> $GITHUB_STEP_SUMMARY
+
       - name: Upload run artifacts (downloads)
         uses: actions/upload-artifact@v4
         with:
