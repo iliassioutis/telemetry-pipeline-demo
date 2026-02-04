@@ -26,7 +26,7 @@ ingest -> land to lake -> transform/validate -> publish curated tables -> monito
 ## Azure mapping (transferable)
 - Orchestration (Azure Data Factory) -> GitHub Actions
 - Data lake (ADLS Gen2) -> /lake (bronze/silver/gold/quarantine)
-- Serving layer (Azure SQL / Synapse) -> DuckDB + exported CSV/Parquet
+- Serving layer (Azure SQL / Synapse) -> curated Gold CSV exports
 - Secrets (Key Vault) -> GitHub Secrets (pattern)
 - Monitoring (Azure Monitor / Log Analytics) -> Actions run history + logs + artifacts
 
