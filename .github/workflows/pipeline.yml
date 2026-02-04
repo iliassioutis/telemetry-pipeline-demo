@@ -55,16 +55,19 @@ jobs:
       - name: Add run summary
         shell: bash
         run: |
-          echo "## Telemetry pipeline run summary" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "- Run date (UTC): ${{ steps.vars.outputs.date }}" >> $GITHUB_STEP_SUMMARY
-          echo "" >> $GITHUB_STEP_SUMMARY
-          echo "### Key outputs" >> $GITHUB_STEP_SUMMARY
-          echo "- Bronze: lake/bronze/${{ steps.vars.outputs.date }}/" >> $GITHUB_STEP_SUMMARY
-          echo "- Silver: lake/silver/${{ steps.vars.outputs.date }}/sensor_readings_clean.csv" >> $GITHUB_STEP_SUMMARY
-          echo "- Quarantine: lake/quarantine/${{ steps.vars.outputs.date }}/sensor_readings_rejects.csv" >> $GITHUB_STEP_SUMMARY
-          echo "- Gold: lake/gold/${{ steps.vars.outputs.date }}/plant_kpis.csv, asset_health_daily.csv" >> $GITHUB_STEP_SUMMARY
-          echo "- DQ report: reports/dq_${{ steps.vars.outputs.date }}.md" >> $GITHUB_STEP_SUMMARY
+          DATE="${{ steps.vars.outputs.date }}"
+
+          echo "## Telemetry pipeline run summary" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Run date (UTC): $DATE" >> "$GITHUB_STEP_SUMMARY"
+          echo "" >> "$GITHUB_STEP_SUMMARY"
+          echo "### Key outputs" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Bronze (raw landed): lake/bronze/$DATE/ (plants.csv, assets.csv, sensor_readings.jsonl, work_orders.csv, quality_inspections.csv, generation_meta.json)" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Silver (clean readings): lake/silver/$DATE/sensor_readings_clean.csv" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Quarantine (rejects): lake/quarantine/$DATE/sensor_readings_rejects.csv" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Gold (curated): lake/gold/$DATE/plant_kpis.csv, lake/gold/$DATE/asset_health_daily.csv" >> "$GITHUB_STEP_SUMMARY"
+          echo "- Exports: exports/$DATE/plant_kpis.csv" >> "$GITHUB_STEP_SUMMARY"
+          echo "- DQ report: reports/dq_$DATE.md" >> "$GITHUB_STEP_SUMMARY"
 
       - name: Upload run artifacts (downloads)
         uses: actions/upload-artifact@v4
@@ -72,7 +75,8 @@ jobs:
           name: pipeline-artifacts-${{ steps.vars.outputs.date }}
           path: |
             reports/dq_${{ steps.vars.outputs.date }}.md
-            lake/bronze/${{ steps.vars.outputs.date }}/generation_meta.json
-            lake/quarantine/${{ steps.vars.outputs.date }}/sensor_readings_rejects.csv
+            lake/bronze/${{ steps.vars.outputs.date }}/*
+            lake/silver/${{ steps.vars.outputs.date }}/sensor_readings_clean.csv
+            lake/quarantine/${{ steps.vars.outputs.date }}/*.csv
             lake/gold/${{ steps.vars.outputs.date }}/*.csv
             exports/${{ steps.vars.outputs.date }}/*.csv
