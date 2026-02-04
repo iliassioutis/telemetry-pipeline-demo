@@ -38,8 +38,9 @@ jobs:
 
       - name: Generate bronze (synthetic data)
         run: |
+          DATE="${{ steps.vars.outputs.date }}"
           python --version
-          python src/generate_bronze.py
+          python src/generate_bronze.py --date "$DATE"
 
       - name: Bronze -> Silver (validate + quarantine + DQ report)
         run: |
